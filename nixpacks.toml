@@ -1,11 +1,8 @@
-[phases.setup]
-nixPkgs = ["nodejs_20"]
-
 [phases.install]
 cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["npx prisma generate", "npx tsc --skipLibCheck"]
+cmds = ["npx prisma generate"]
 
 [start]
-cmd = "npx prisma migrate deploy && node dist/index.js"
+cmd = "npx prisma migrate deploy && npx ts-node --skipLibCheck src/index.ts"

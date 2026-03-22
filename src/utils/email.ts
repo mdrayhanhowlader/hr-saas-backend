@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'your-resend-api-key' ? new Resend(process.env.RESEND_API_KEY) : null;
 
 interface WelcomeEmailParams {
   to: string;
@@ -19,6 +19,10 @@ export const sendWelcomeEmail = async (params: WelcomeEmailParams) => {
     return false;
   }
 
+  if (!resend) {
+    console.log('Email skipped - no API key');
+    return false;
+  }
   try {
     await resend.emails.send({
       from: 'HR System <onboarding@resend.dev>',
@@ -95,6 +99,10 @@ export const sendWelcomeEmail = async (params: WelcomeEmailParams) => {
 export const sendLeaveStatusEmail = async (to: string, firstName: string, status: string, leaveType: string, days: number) => {
   if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'your-resend-api-key') return false;
 
+  if (!resend) {
+    console.log('Email skipped - no API key');
+    return false;
+  }
   try {
     await resend.emails.send({
       from: 'HR System <onboarding@resend.dev>',
