@@ -3,8 +3,3 @@ builder = "dockerfile"
 
 [deploy]
 startCommand = "npx prisma migrate deploy && node dist/index.js"
-restartPolicyType = "on-failure"
-restartPolicyMaxRetries = 3
-
-[[services]]
-name = "hr-saas-backend"
