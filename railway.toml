@@ -2,4 +2,4 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "npx prisma migrate deploy && npx ts-node --skipLibCheck src/index.ts"
+startCommand = "npx prisma migrate deploy && node dist/index.js"

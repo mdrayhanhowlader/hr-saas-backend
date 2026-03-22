@@ -2,7 +2,7 @@
 cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["npx prisma generate"]
+cmds = ["npx prisma generate", "npx tsc --skipLibCheck"]
 
 [start]
-cmd = "npx prisma migrate deploy && npx ts-node --skipLibCheck src/index.ts"
+cmd = "npx prisma migrate deploy && node dist/index.js"
