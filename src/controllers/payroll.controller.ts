@@ -130,9 +130,7 @@ export const generatePayroll = async (req: AuthRequest, res: Response) => {
         }, 0);
       }
 
-      const perDaySalary = originalBasic / workingDays;
-      const salaryDeductionForAbsent = absentDays > 0 ? perDaySalary * absentDays : 0;
-      const earnedBasic = Math.max(0, originalBasic - salaryDeductionForAbsent);
+      const earnedBasic = originalBasic;
 
       const houseAllowance = earnedBasic * 0.4;
       const medicalAllowance = earnedBasic * 0.1;
