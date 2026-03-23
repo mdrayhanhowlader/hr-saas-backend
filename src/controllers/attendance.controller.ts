@@ -303,3 +303,59 @@ export const manualAttendance = async (req: AuthRequest, res: Response) => {
     return sendError(res, 'Failed to save attendance', 500);
   }
 };
+
+export const manualAttendance = async (req: AuthRequest, res: Response) => {
+  try {
+    const { employeeId, date, status, checkIn, checkOut, note } = req.body;
+    if (!employeeId || !date || !status) {
+      return sendError(res, 'Employee, date and status are required');
+    }
+
+    const employee = await prisma.employee.findFirst({
+      where: { id: employeeId, tenantId: req.user!.tenantId }
+    });
+    if (!employee) return sendError(res, 'Employee not found', 404);
+
+    const attendanceDate = new Date(date);
+    attendanceDate.setHours(0, 0, 0, 0);
+
+    const checkInTime = checkIn ? new Date(`${date}T${checkIn}:00`) : null;
+    const checkOutTime = checkOut ? new Date(`${date}T${checkOut}:00`) : null;
+
+    let workHours = null;
+    if (checkInTime && checkOutTime) {
+      workHours = ((checkOutTime.getTime() - checkInTime.getTime()) / (1000 * 60 * 60)).toFixed(2);
+    }
+
+    const existing = await prisma.attendance.findFirst({
+      where: { employeeId, date: attendanceDate }
+    });
+
+    let attendance;
+    if (existing) {
+      attendance = await prisma.attendance.update({
+        where: { id: existing.id },
+        data: { status, checkIn: checkInTime, checkOut: checkOutTime, workHours, note, source: 'MANUAL' }
+      });
+    } else {
+      attendance = await prisma.attendance.create({
+        data: {
+          tenantId: req.user!.tenantId,
+          employeeId,
+          date: attendanceDate,
+          status,
+          checkIn: checkInTime,
+          checkOut: checkOutTime,
+          workHours,
+          note,
+          source: 'MANUAL',
+        }
+      });
+    }
+
+    return sendSuccess(res, existing ? 'Attendance updated' : 'Attendance created', attendance);
+  } catch (error) {
+    console.error('Manual attendance error:', error);
+    return sendError(res, 'Failed to save attendance', 500);
+  }
+};
